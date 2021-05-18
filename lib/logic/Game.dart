@@ -218,9 +218,8 @@ class Game {
             _currentShape = _shapes[_rng.nextInt(_shapes.length - 1)];
             _currentShape.initShapeData();
             _posx = (COLUMNS / 2 - _currentShape._columns / 2).toInt();
-            _posy = (_currentShape.getRows() / 2).toInt();
+            _posy =0; //-(_currentShape.getRows() / 2).toInt();
             if (_checkForObstacle(0)) {
-              _insertCurrentShape();
               _state = GameState.gameOver;
             }
           } else {
