@@ -25,17 +25,7 @@ class Grid extends StatefulWidget {
 }
 
 class _GridState extends State<Grid> {
-  Timer timer;
-  @override
-  void initState() {
-    super.initState();
-
-    //generate the matrix the in the logique side( singleton)
-    //start the update loop (timer.periodec with 30fps)
-    timer = Timer.periodic(Duration(milliseconds: 30), (timer) {
-      Game.getInstance().update();
-    });
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -105,9 +95,5 @@ class _GridState extends State<Grid> {
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    timer.cancel();
-  }
+  
 }

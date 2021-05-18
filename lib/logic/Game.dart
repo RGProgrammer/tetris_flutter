@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -143,19 +144,20 @@ class Shape {
   void rotateClockWise() {
     //TODO transpose _data content
   }
-  int getRows(){
-    return this._lines ;
+  int getRows() {
+    return this._lines;
   }
-  int getColumns(){
-    return this._columns ;
+
+  int getColumns() {
+    return this._columns;
   }
-  bool getCellValue (int row , column){
-    if(row < 0 || row >=_lines)
-      return false  ;
-    if(column <0 || column>= _columns){
-      return false ;
+
+  bool getCellValue(int row, column) {
+    if (row < 0 || row >= _lines) return false;
+    if (column < 0 || column >= _columns) {
+      return false;
     }
-    return _data[row * _lines + column];
+    return _data[row * _columns + column];
   }
 }
 
@@ -163,15 +165,17 @@ class Game {
   static const int ROWS = 20;
   static const int COLUMNS = 10;
 
-  double _speed;
   List<Cell> _matrix;
-  int level;
-  int score;
+  int level = 1;
+  int score = 0;
   GameState _state;
   List<Shape> _shapes = List.filled(7, null);
 
-  Shape _currentShape = null;
+  Shape _currentShape;
   int _posx = 0, _posy = 0;
+  int _waitTimeBetweenFrames = 40;
+  int _ticks = 0;
+  Random _rng;
 
   static Game _instance;
   static Game getInstance() {
@@ -182,7 +186,6 @@ class Game {
   }
 
   Game._() {
-    this._speed = 10;
     this._matrix = new List.filled(ROWS * COLUMNS, null); // 20 row by 10 column
     for (int i = 0; i < ROWS * COLUMNS; ++i) {
       _matrix[i] = new Cell();
@@ -194,7 +197,8 @@ class Game {
     _shapes[4] = Shape.createMirroredSShape();
     _shapes[5] = Shape.createLShape();
     _shapes[6] = Shape.createMirroredLShape();
-    _state=GameState.notStarted ;
+    _state = GameState.notStarted;
+    _rng = new Random();
   }
   bool issGameOver() {
     return _state == GameState.gameOver ? true : false;
@@ -207,15 +211,28 @@ class Game {
       case GameState.paused:
         break;
       case GameState.running:
-        if (_currentShape == null) {
-          _currentShape = _shapes[0];
-          _currentShape.initShapeData();
-          _posx = (COLUMNS/2 - _currentShape._columns /2).toInt(); _posy = 0 ;
-          print("shape created and initialized ");
-          print ("shape pos x:$_posx  y:$_posy");
-          print("grid size rows : $ROWS  columns: $COLUMNS ");
-        }else{
-          //TODO check if shape move another step down
+        _ticks++;
+        if (_ticks >= _waitTimeBetweenFrames) {
+          _ticks = 0;
+          if (_currentShape == null) {
+            _currentShape = _shapes[_rng.nextInt(_shapes.length - 1)];
+            _currentShape.initShapeData();
+            _posx = (COLUMNS / 2 - _currentShape._columns / 2).toInt();
+            _posy = (_currentShape.getRows() / 2).toInt();
+            if (_checkForObstacle(0)) {
+              _insertCurrentShape();
+              _state = GameState.gameOver;
+            }
+          } else {
+            if (_currentShape.getRows() + _posy >= ROWS ||
+                _checkForObstacle(0)) {
+              _insertCurrentShape();
+              _currentShape = null;
+              _updateLevelAndScore();
+            } else {
+              _posy += 1;
+            }
+          }
         }
         break;
       case GameState.gameOver:
@@ -224,7 +241,14 @@ class Game {
   }
 
   void startGame() {
-    if (_state == GameState.notStarted) _state = GameState.running;
+    if (_state == GameState.notStarted)
+      _state = GameState.running;
+    else if (_state == GameState.gameOver) {
+      for (int i = 0; i < ROWS * COLUMNS; ++i) {
+        _matrix[i].isFilled = false;
+      }
+      _state = GameState.running;
+    }
   }
 
   Cell getCell(int row, int column) {
@@ -237,30 +261,98 @@ class Game {
     return _matrix[row * 10 + column];
   }
 
-  Shape getCurrentShape(){return _currentShape ;}
-  int getCurrentShapePosx(){return _posx ;}
-  int getCurrentShapePosy(){return _posy ;}
+  Shape getCurrentShape() {
+    return _currentShape;
+  }
+
+  int getCurrentShapePosx() {
+    return _posx;
+  }
+
+  int getCurrentShapePosy() {
+    return _posy;
+  }
+
   void rotateCurrentShape() {
-     //TODO check if shape can rotate
-     
-     //if true  rotate
-     _currentShape?.rotateClockWise();
+    if (_canRotateCurrentShape()) _currentShape?.rotateClockWise();
   }
+
   void moveLeft() {
-
+    if (_currentShape != null && !_checkForObstacle(-1)) _posx--;
   }
+
   void moveRight() {
-
+    if (_currentShape != null && !_checkForObstacle(1)) _posx++;
   }
-  void dropShape() {
 
+  void moveDown() {
+    if (_currentShape != null && !_checkForObstacle(0)) _posy++;
   }
 
   bool isCoveredByShape(int r, int c) {
-    if(r<0 || c < 0)
-      return false ;
-    if(r>_currentShape.getRows() || c> _currentShape.getColumns())
-      return false ;
-    return _currentShape.getCellValue(r,c);
+    if (r < 0 || c < 0) return false;
+    if (r > _currentShape.getRows() || c > _currentShape.getColumns())
+      return false;
+    return _currentShape.getCellValue(r, c);
+  }
+
+  void _insertCurrentShape() {
+    for (int row = 0; row < _currentShape.getRows(); row++) {
+      for (int col = 0; col < _currentShape.getColumns(); col++) {
+        if (_currentShape.getCellValue(row, col)) {
+          _matrix[COLUMNS * (_posy + row) + _posx + col].isFilled =
+              _currentShape.getCellValue(row, col);
+          _matrix[COLUMNS * (_posy + row) + _posx + col].color =
+              _currentShape.color;
+        }
+      }
+    }
+  }
+
+  //TODO implementations
+  bool _checkForObstacle(int direction) {
+    switch (direction) {
+      case -1:
+        if (_posx == 0) // the left wall is consideraed as an obstacle
+          return true;
+        //else check if encountered a filled cell
+        for (int i = _currentShape.getRows() - 1; i >= 0; i--) {
+          for (int j = 0; j < _currentShape.getColumns(); j++)
+            if (_currentShape.getCellValue(i, j) &&
+                getCell(_posy + i, _posx - 1 + j).isFilled) return true;
+        }
+        break;
+      case 0:
+        if (_posy + _currentShape.getRows() ==
+            ROWS) // the right wall is consideraed as an obstacle
+          return true;
+
+        for (int i = _currentShape.getColumns() - 1; i >= 0; i--) {
+          if (_currentShape.getCellValue(_currentShape.getRows() - 1, i) &&
+              getCell(_posy + _currentShape.getRows(), _posx + i).isFilled)
+            return true;
+        }
+        break;
+      case 1:
+        if (_posx + _currentShape.getColumns() ==
+            COLUMNS) // the right wall is consideraed as an obstacle
+          return true;
+
+        for (int i = _currentShape.getRows() - 1; i >= 0; i--) {
+          for (int j = 0 - 1; j < _currentShape.getColumns(); ++j)
+            if (_currentShape.getCellValue(i, j) &&
+                getCell(_posy + i, _posx + _currentShape.getColumns() - j)
+                    .isFilled) return true;
+        }
+        break;
+    }
+    //any other case considered a no obstacle encountered
+    return false;
+  }
+
+  bool _canRotateCurrentShape() {}
+
+  void _updateLevelAndScore() {
+    //check for lines
   }
 }

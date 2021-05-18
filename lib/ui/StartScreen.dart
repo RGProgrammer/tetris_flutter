@@ -16,7 +16,7 @@ class StartScreen extends StatefulWidget {
 class _StartScreenState extends State<StartScreen> {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return Material (child :GestureDetector(
         onTap: () {
           AssetsAudioPlayer.playAndForget(
             widget.startSound,
@@ -52,6 +52,6 @@ class _StartScreenState extends State<StartScreen> {
                       color: Colors.white, fontFamily: "EightBitDragon"),
                 ),
               ],
-            )));
+            ))));
   }
 }
