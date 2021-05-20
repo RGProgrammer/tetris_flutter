@@ -5,8 +5,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tetris_game/logic/Game.dart';
 import 'package:tetris_game/ui/PlayScreen.dart';
 
-import 'Grid.dart';
-
 class StartScreen extends StatefulWidget {
   final Audio startSound = Audio("assets/sound/start.mp3", playSpeed: 1.2);
   @override

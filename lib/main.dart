@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tetris_game/ui/Grid.dart';
 import 'package:tetris_game/ui/StartScreen.dart';
 
 void main() {

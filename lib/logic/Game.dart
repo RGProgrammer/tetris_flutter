@@ -203,12 +203,18 @@ class Game {
   bool issGameOver() {
     return _state == GameState.gameOver ? true : false;
   }
+   bool isGameRunning() {
+    return _state == GameState.running ? true : false;
+  }
+   bool isGamePaused() {
+    return _state == GameState.paused ? true : false;
+  }
 
   void update() {
     switch (_state) {
       case GameState.notStarted:
-        break;
       case GameState.paused:
+      case GameState.gameOver:
         break;
       case GameState.running:
         _ticks++;
@@ -234,13 +240,12 @@ class Game {
           }
         }
         break;
-      case GameState.gameOver:
-        break;
+      
     }
   }
 
   void startGame() {
-    if (_state == GameState.notStarted)
+    if (_state == GameState.notStarted || _state==GameState.paused)
       _state = GameState.running;
     else if (_state == GameState.gameOver) {
       for (int i = 0; i < ROWS * COLUMNS; ++i) {
@@ -248,6 +253,10 @@ class Game {
       }
       _state = GameState.running;
     }
+  }
+  void pauseGame(){
+    if(_state==GameState.running)
+      _state=GameState.paused ;
   }
 
   Cell getCell(int row, int column) {
@@ -308,7 +317,7 @@ class Game {
     }
   }
 
-  //TODO implementations
+ 
   bool _checkForObstacle(int direction) {
     switch (direction) {
       case -1:
@@ -318,6 +327,7 @@ class Game {
         for (int row = _currentShape.getRows() - 1; row >= 0; row--) {
           for (int col = 0; col < _currentShape.getColumns(); col++)
             if (_currentShape.getCellValue(row, col) &&
+                getCell(_posy + row, _posx - 1 + col) != null &&
                 getCell(_posy + row, _posx - 1 + col).isFilled) return true;
         }
         break;
@@ -327,11 +337,10 @@ class Game {
           return true;
 
         for (int col = _currentShape.getColumns() - 1; col >= 0; col--) {
-          for(int row = _currentShape.getRows()-1 ; row>=0 ;row--)
-        
-          if (_currentShape.getCellValue(row, col) &&
-              getCell(_posy + row+1, _posx + col).isFilled)
-            return true;
+          for (int row = _currentShape.getRows() - 1; row >= 0; row--)
+            if (_currentShape.getCellValue(row, col) &&
+                getCell(_posy + row + 1, _posx + col) != null &&
+                getCell(_posy + row + 1, _posx + col).isFilled) return true;
         }
         break;
       case 1:
@@ -342,6 +351,8 @@ class Game {
         for (int i = _currentShape.getRows() - 1; i >= 0; i--) {
           for (int j = 0 - 1; j < _currentShape.getColumns(); ++j)
             if (_currentShape.getCellValue(i, j) &&
+                getCell(_posy + i, _posx + _currentShape.getColumns() - j) !=
+                    null &&
                 getCell(_posy + i, _posx + _currentShape.getColumns() - j)
                     .isFilled) return true;
         }
@@ -351,7 +362,10 @@ class Game {
     return false;
   }
 
-  bool _canRotateCurrentShape() {}
+   //TODO implementations
+  bool _canRotateCurrentShape() {
+    return false ;
+  }
 
   void _updateLevelAndScore() {
     //check for lines
