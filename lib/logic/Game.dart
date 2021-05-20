@@ -218,7 +218,7 @@ class Game {
             _currentShape = _shapes[_rng.nextInt(_shapes.length - 1)];
             _currentShape.initShapeData();
             _posx = (COLUMNS / 2 - _currentShape._columns / 2).toInt();
-            _posy =0; //-(_currentShape.getRows() / 2).toInt();
+            _posy = -(_currentShape.getRows() ~/ 2);
             if (_checkForObstacle(0)) {
               _state = GameState.gameOver;
             }
@@ -315,10 +315,10 @@ class Game {
         if (_posx == 0) // the left wall is consideraed as an obstacle
           return true;
         //else check if encountered a filled cell
-        for (int i = _currentShape.getRows() - 1; i >= 0; i--) {
-          for (int j = 0; j < _currentShape.getColumns(); j++)
-            if (_currentShape.getCellValue(i, j) &&
-                getCell(_posy + i, _posx - 1 + j).isFilled) return true;
+        for (int row = _currentShape.getRows() - 1; row >= 0; row--) {
+          for (int col = 0; col < _currentShape.getColumns(); col++)
+            if (_currentShape.getCellValue(row, col) &&
+                getCell(_posy + row, _posx - 1 + col).isFilled) return true;
         }
         break;
       case 0:
@@ -326,9 +326,11 @@ class Game {
             ROWS) // the right wall is consideraed as an obstacle
           return true;
 
-        for (int i = _currentShape.getColumns() - 1; i >= 0; i--) {
-          if (_currentShape.getCellValue(_currentShape.getRows() - 1, i) &&
-              getCell(_posy + _currentShape.getRows(), _posx + i).isFilled)
+        for (int col = _currentShape.getColumns() - 1; col >= 0; col--) {
+          for(int row = _currentShape.getRows()-1 ; row>=0 ;row--)
+        
+          if (_currentShape.getCellValue(row, col) &&
+              getCell(_posy + row+1, _posx + col).isFilled)
             return true;
         }
         break;
