@@ -141,30 +141,44 @@ class _PlayScreenState extends State<PlayScreen> with WidgetsBindingObserver {
                         Game.getInstance().moveLeft();
                       },
                       child: Container(
-                        color: Colors.green,
+                        color: Colors.grey,
                         height: 50,
-                        width: 70,
+                        width: 50,
                         margin: EdgeInsets.symmetric(horizontal: 20),
+                         child: Icon(Icons.arrow_back,color: Colors.white,)
                       )),
                   GestureDetector(
                       onTap: () {
                         Game.getInstance().moveDown();
                       },
                       child: Container(
-                        color: Colors.blue,
+                        color: Colors.grey,
                         height: 50,
-                        width: 70,
+                        width: 50,
                         margin: EdgeInsets.symmetric(horizontal: 20),
+                        child: Icon(Icons.arrow_downward,color: Colors.white,),
+                      )),
+                  GestureDetector(
+                      onTap: () {
+                        Game.getInstance().rotateCurrentShape();
+                      },
+                      child: Container(
+                        color: Colors.grey,
+                        height: 50,
+                        width: 50,
+                        margin: EdgeInsets.symmetric(horizontal: 20),
+                         child: Icon(Icons.rotate_right,color: Colors.white,)
                       )),
                   GestureDetector(
                       onTap: () {
                         Game.getInstance().moveRight();
                       },
                       child: Container(
-                        color: Colors.red,
+                        color: Colors.grey,
                         height: 50,
-                        width: 70,
+                        width: 50,
                         margin: EdgeInsets.symmetric(horizontal: 20),
+                         child: Icon(Icons.arrow_forward,color: Colors.white,)
                       )),
                 ],
               )),

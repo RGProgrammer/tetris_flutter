@@ -78,6 +78,7 @@ class Shape {
     return ret;
   }
 
+  static List<bool> _useToRotate = List.filled(6, false);
   Shape._(int lines, int columns) {
     _lines = lines;
     _columns = columns;
@@ -87,18 +88,24 @@ class Shape {
   void initShapeData() {
     switch (_shapeCode) {
       case 1:
+        _lines = 2;
+        _columns = 2;
         _data[0] = true;
         _data[1] = true;
         _data[2] = true;
         _data[3] = true;
         break;
       case 2:
+        _lines = 1;
+        _columns = 4;
         _data[0] = true;
         _data[1] = true;
         _data[2] = true;
         _data[3] = true;
         break;
       case 3:
+        _lines = 2;
+        _columns = 3;
         _data[0] = false;
         _data[1] = true;
         _data[2] = false;
@@ -107,6 +114,8 @@ class Shape {
         _data[5] = true;
         break;
       case 4:
+        _lines = 2;
+        _columns = 3;
         _data[0] = false;
         _data[1] = true;
         _data[2] = true;
@@ -115,6 +124,8 @@ class Shape {
         _data[5] = false;
         break;
       case 5:
+        _lines = 2;
+        _columns = 3;
         _data[0] = true;
         _data[1] = true;
         _data[2] = false;
@@ -123,6 +134,8 @@ class Shape {
         _data[5] = true;
         break;
       case 6:
+        _lines = 2;
+        _columns = 3;
         _data[0] = true;
         _data[1] = false;
         _data[2] = false;
@@ -131,6 +144,8 @@ class Shape {
         _data[5] = true;
         break;
       case 7:
+        _lines = 2;
+        _columns = 3;
         _data[0] = false;
         _data[1] = false;
         _data[2] = true;
@@ -142,8 +157,33 @@ class Shape {
   }
 
   void rotateClockWise() {
-    //TODO transpose _data content
+    if (_lines == _columns) return;
+
+    int t;
+    if (_lines == 1 || _columns == 1) {
+      t = _lines;
+      _lines = _columns;
+      _columns = t;
+      return;
+    }
+  print(_data);
+    for (int col = 0, index = 0; col < _columns; col++) {
+      for (int row = _lines-1 ; row>=0; row--) {
+        _useToRotate[index] =
+            _data[row* _columns + col];
+            index++ ;
+      }
+    }
+    print(_useToRotate);
+      t = _lines;
+      _lines = _columns;
+      _columns = t;
+    for (int index = 0; index < _columns * _lines; index++) {
+      _data[index] = _useToRotate[index];
+    }
+   
   }
+
   int getRows() {
     return this._lines;
   }
@@ -203,10 +243,12 @@ class Game {
   bool issGameOver() {
     return _state == GameState.gameOver ? true : false;
   }
-   bool isGameRunning() {
+
+  bool isGameRunning() {
     return _state == GameState.running ? true : false;
   }
-   bool isGamePaused() {
+
+  bool isGamePaused() {
     return _state == GameState.paused ? true : false;
   }
 
@@ -240,12 +282,11 @@ class Game {
           }
         }
         break;
-      
     }
   }
 
   void startGame() {
-    if (_state == GameState.notStarted || _state==GameState.paused)
+    if (_state == GameState.notStarted || _state == GameState.paused)
       _state = GameState.running;
     else if (_state == GameState.gameOver) {
       for (int i = 0; i < ROWS * COLUMNS; ++i) {
@@ -254,9 +295,9 @@ class Game {
       _state = GameState.running;
     }
   }
-  void pauseGame(){
-    if(_state==GameState.running)
-      _state=GameState.paused ;
+
+  void pauseGame() {
+    if (_state == GameState.running) _state = GameState.paused;
   }
 
   Cell getCell(int row, int column) {
@@ -282,7 +323,16 @@ class Game {
   }
 
   void rotateCurrentShape() {
-    if (_canRotateCurrentShape()) _currentShape?.rotateClockWise();
+    if (_canRotateCurrentShape()) {
+      _posy += (_currentShape.getRows() - _currentShape.getColumns()) ~/ 2;
+      _posx += (_currentShape.getColumns() - _currentShape.getRows()) ~/ 2;
+      if(_posx<0 )
+        _posx= 0 ;
+      if(_posx + _currentShape.getRows()>COLUMNS )
+         _posx= COLUMNS - _currentShape.getRows() ;
+
+      _currentShape?.rotateClockWise();
+    }
   }
 
   void moveLeft() {
@@ -317,7 +367,6 @@ class Game {
     }
   }
 
- 
   bool _checkForObstacle(int direction) {
     switch (direction) {
       case -1:
@@ -362,12 +411,56 @@ class Game {
     return false;
   }
 
-   //TODO implementations
+  
   bool _canRotateCurrentShape() {
-    return false ;
-  }
+    if (_currentShape != null) {
+      int newPosy = _posy +(_currentShape.getRows() - _currentShape.getColumns()) ~/ 2;
+      int newPosx = _posx + (_currentShape.getColumns() - _currentShape.getRows()) ~/ 2;
 
+      if(newPosx<0 )
+        newPosx= 0 ;
+      if(newPosx + _currentShape.getRows()>COLUMNS )
+         newPosx= COLUMNS - _currentShape.getRows() ;
+
+      if(newPosy + _currentShape.getColumns()> ROWS)
+        return false ;
+
+      for (int col = 0; col < _currentShape.getRows(); col++) {
+        for (int row = 0; row < _currentShape.getColumns(); row++) {
+          if (_currentShape.getCellValue(
+                  _currentShape.getRows() - row - 1, col) &&
+              getCell(newPosy + row, newPosx + col)!=null &&
+              getCell(newPosy + row, newPosx + col).isFilled) return false;
+        }
+      }
+    }
+    return true;
+  }
+  
   void _updateLevelAndScore() {
-    //check for lines
+    int linesToCheck = ROWS ;
+    bool clear ;
+    for(int index = 0 ; index< linesToCheck ; ){
+      clear =true ;
+      for(int c = 0 ;c< COLUMNS  ; c++){
+        if(!getCell(ROWS-index-1, c).isFilled){
+          clear= false ;
+          break ;
+        }   
+      }
+      if(clear){
+        //TODO update score, level , speed
+        score+=1000;
+        for(int r=1; r<linesToCheck ; r++ )
+        for(int c = 0 ;c< COLUMNS ; c++){
+          
+          _matrix[(ROWS-index-r) *COLUMNS+c] .isFilled =_matrix[( ROWS-index-r-1)*COLUMNS+c].isFilled ;
+          _matrix[(ROWS-index-r) *COLUMNS+c] .color =_matrix[( ROWS-index-r-1)*COLUMNS+c].color ;
+        }
+         linesToCheck-- ;
+      }else{
+        index++ ;
+      }
+    }
   }
 }
