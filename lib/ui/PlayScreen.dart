@@ -118,35 +118,71 @@ class _PlayScreenState extends State<PlayScreen> with WidgetsBindingObserver {
                   ),
                   Container(
                       child: InkWell(
-                         onTap: (){ Game.getInstance().pauseGame();},
+                          onTap: () {
+                            Game.getInstance().pauseGame();
+                          },
                           child: Icon(
-                    Icons.pause,
-                    color: Colors.white,
-                    size: 50,
-                  )))
+                            Icons.pause,
+                            color: Colors.white,
+                            size: 50,
+                          )))
                 ],
               )),
         ),
-        Expanded(flex: 8, child: Grid()),
+        Expanded(flex: 6, child: Grid()),
         Expanded(
-          flex: 1,
+          flex: 3,
           child: Container(
               color: const Color(0xff1f1f1f),
-              child: Row(
+              child: Column(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   GestureDetector(
                       onTap: () {
-                        Game.getInstance().moveLeft();
+                        Game.getInstance().rotateCurrentShape();
                       },
                       child: Container(
-                        color: Colors.grey,
-                        height: 50,
-                        width: 50,
-                        margin: EdgeInsets.symmetric(horizontal: 20),
-                         child: Icon(Icons.arrow_back,color: Colors.white,)
-                      )),
+                          color: Colors.grey,
+                          height: 50,
+                          width: 50,
+                          margin: EdgeInsets.symmetric(horizontal: 20),
+                          child: Icon(
+                            Icons.rotate_right,
+                            color: Colors.white,
+                          ))),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      GestureDetector(
+                          onTap: () {
+                            Game.getInstance().moveLeft();
+                          },
+                          child: Container(
+                              color: Colors.grey,
+                              height: 50,
+                              width: 50,
+                              margin: EdgeInsets.symmetric(horizontal: 20),
+                              child: Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                              ))),
+                      GestureDetector(
+                          onTap: () {
+                            Game.getInstance().moveRight();
+                          },
+                          child: Container(
+                              color: Colors.grey,
+                              height: 50,
+                              width: 50,
+                              margin: EdgeInsets.symmetric(horizontal: 20),
+                              child: Icon(
+                                Icons.arrow_forward,
+                                color: Colors.white,
+                              ))),
+                    ],
+                  ),
                   GestureDetector(
                       onTap: () {
                         Game.getInstance().moveDown();
@@ -156,29 +192,10 @@ class _PlayScreenState extends State<PlayScreen> with WidgetsBindingObserver {
                         height: 50,
                         width: 50,
                         margin: EdgeInsets.symmetric(horizontal: 20),
-                        child: Icon(Icons.arrow_downward,color: Colors.white,),
-                      )),
-                  GestureDetector(
-                      onTap: () {
-                        Game.getInstance().rotateCurrentShape();
-                      },
-                      child: Container(
-                        color: Colors.grey,
-                        height: 50,
-                        width: 50,
-                        margin: EdgeInsets.symmetric(horizontal: 20),
-                         child: Icon(Icons.rotate_right,color: Colors.white,)
-                      )),
-                  GestureDetector(
-                      onTap: () {
-                        Game.getInstance().moveRight();
-                      },
-                      child: Container(
-                        color: Colors.grey,
-                        height: 50,
-                        width: 50,
-                        margin: EdgeInsets.symmetric(horizontal: 20),
-                         child: Icon(Icons.arrow_forward,color: Colors.white,)
+                        child: Icon(
+                          Icons.arrow_downward,
+                          color: Colors.white,
+                        ),
                       )),
                 ],
               )),
