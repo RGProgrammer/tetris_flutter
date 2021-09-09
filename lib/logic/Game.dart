@@ -449,7 +449,7 @@ class Game {
         }   
       }
       if(clear){
-        //TODO update score, level , speed
+        //TODO update score, level , speed(_waitTimeBetweenFrames)
         score+=1000;
         for(int r=1; r<linesToCheck ; r++ )
         for(int c = 0 ;c< COLUMNS ; c++){

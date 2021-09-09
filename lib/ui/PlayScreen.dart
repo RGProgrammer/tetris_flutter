@@ -18,10 +18,8 @@ class _PlayScreenState extends State<PlayScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    //generate the matrix the in the logique side( singleton)
     //start the update loop (timer.periodec with 30fps)
     timer = Timer.periodic(Duration(milliseconds: 30), (timer) {
-      Game.getInstance().update();
       setState(() {
         Game.getInstance().update();
       });
@@ -66,140 +64,214 @@ class _PlayScreenState extends State<PlayScreen> with WidgetsBindingObserver {
       Game.getInstance().pauseGame();
   }
 
+  
   Widget _constructPlayPanel() {
     return Column(
-      children: <Widget>[
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: [
         Expanded(
-          flex: 1,
+            flex: 8,
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Expanded(flex: 8,child:Grid(wallColor: Colors.white,)),
+                Expanded(
+                    flex: 3,
+                    child: Container(
+                        color: Color(0x0ff173f5f),
+                        child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 5),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 5, horizontal: 5),
+                                    child: Text(
+                                      "Level :   ",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: "EightBitDragon"),
+                                    )),
+                                Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 5, horizontal: 5),
+                                    child: Text(
+                                      Game.getInstance()?.level.toString(),
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: "EightBitDragon"),
+                                    )),
+                                Container(height: 20),
+                                Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 5, horizontal: 5),
+                                    child: Text(
+                                      "Score :   ",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: "EightBitDragon"),
+                                    )),
+                                Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 5, horizontal: 5),
+                                    child: Text(
+                                        Game.getInstance()?.score.toString(),
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontFamily: "EightBitDragon"))),
+                              ],
+                            )))),
+              ],
+            )),
+        Expanded(
+          flex: 2,
           child: Container(
-              color: Colors.black,
               child: Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            "Level :   ",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: "EightBitDragon"),
-                          ),
-                          Text(
-                            Game.getInstance()?.level.toString(),
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: "EightBitDragon"),
-                          )
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            "Score :   ",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: "EightBitDragon"),
-                          ),
-                          Text(
-                            Game.getInstance()?.score.toString(),
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: "EightBitDragon"),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                  Container(
-                      child: InkWell(
-                          onTap: () {
-                            Game.getInstance().pauseGame();
-                          },
-                          child: Icon(
-                            Icons.pause,
-                            color: Colors.white,
-                            size: 50,
-                          )))
-                ],
-              )),
-        ),
-        Expanded(flex: 6, child: Grid()),
-        Expanded(
-          flex: 3,
-          child: Container(
-              color: const Color(0xff1f1f1f),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                      onTap: () {
-                        Game.getInstance().rotateCurrentShape();
-                      },
-                      child: Container(
-                          color: Colors.grey,
-                          height: 50,
-                          width: 50,
-                          margin: EdgeInsets.symmetric(horizontal: 20),
-                          child: Icon(
-                            Icons.rotate_right,
-                            color: Colors.white,
-                          ))),
-                  Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      GestureDetector(
-                          onTap: () {
-                            Game.getInstance().moveLeft();
-                          },
-                          child: Container(
-                              color: Colors.grey,
-                              height: 50,
-                              width: 50,
-                              margin: EdgeInsets.symmetric(horizontal: 20),
-                              child: Icon(
-                                Icons.arrow_back,
-                                color: Colors.white,
-                              ))),
-                      GestureDetector(
-                          onTap: () {
-                            Game.getInstance().moveRight();
-                          },
-                          child: Container(
-                              color: Colors.grey,
-                              height: 50,
-                              width: 50,
-                              margin: EdgeInsets.symmetric(horizontal: 20),
-                              child: Icon(
-                                Icons.arrow_forward,
-                                color: Colors.white,
-                              ))),
-                    ],
-                  ),
-                  GestureDetector(
-                      onTap: () {
-                        Game.getInstance().moveDown();
-                      },
-                      child: Container(
-                        color: Colors.grey,
-                        height: 50,
-                        width: 50,
-                        margin: EdgeInsets.symmetric(horizontal: 20),
-                        child: Icon(
-                          Icons.arrow_downward,
-                          color: Colors.white,
-                        ),
-                      )),
-                ],
-              )),
-        ),
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Expanded(
+                  flex: 4,
+                  child: Container(
+                      alignment: Alignment.center,
+                      child: AspectRatio(
+                          aspectRatio: 2,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                return Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Container(
+                                          height: constraints.maxHeight / 2,
+                                          width: constraints.maxWidth,
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              Expanded(
+                                                  flex: 1,
+                                                  child: FittedBox(
+                                                      child: GestureDetector(
+                                                          onTap: () {
+                                                            Game.getInstance()
+                                                                .moveLeft();
+                                                          },
+                                                          child: Container(
+                                                              decoration: BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  color: Colors
+                                                                      .yellow),
+                                                              child: Icon(
+                                                                Icons
+                                                                    .arrow_left_sharp,
+                                                                color: Colors
+                                                                    .black,
+                                                              ))))),
+                                              Expanded(
+                                                  flex: 1, child: Container()),
+                                              Expanded(
+                                                  flex: 1,
+                                                  child: FittedBox(
+                                                      child: GestureDetector(
+                                                          onTap: () {
+                                                            Game.getInstance()
+                                                                .moveRight();
+                                                          },
+                                                          child: Container(
+                                                              decoration: BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  color: Colors
+                                                                      .yellow),
+                                                              child: Icon(
+                                                                Icons
+                                                                    .arrow_right_sharp,
+                                                                color: Colors
+                                                                    .black,
+                                                              ))))),
+                                            ],
+                                          )),
+                                      Container(
+                                          height: constraints.maxHeight / 2,
+                                          width: constraints.maxWidth,
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              Expanded(
+                                                  flex: 1, child: Container()),
+                                              Expanded(
+                                                  flex: 1,
+                                                  child: FittedBox(
+                                                      child: GestureDetector(
+                                                          onTap: () {
+                                                            Game.getInstance()
+                                                                .moveDown();
+                                                          },
+                                                          child: Container(
+                                                              decoration: BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  color: Colors
+                                                                      .yellow),
+                                                              child: Icon(
+                                                                Icons
+                                                                    .arrow_drop_down_sharp,
+                                                                color: Colors
+                                                                    .black,
+                                                              ))))),
+                                              Expanded(
+                                                  flex: 1, child: Container()),
+                                            ],
+                                          ))
+                                    ]);
+                              },
+                            ),
+                          )))),
+              Expanded(
+                  flex: 2,
+                  child: Container(
+                    child: AspectRatio(
+                        aspectRatio: 1,
+                        child: Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Container(
+                                color: Colors.yellow,
+                                child: InkWell(
+                                    onTap: () {
+                                      Game.getInstance().pauseGame();
+                                    },
+                                    child: Icon(
+                                      Icons.pause,
+                                      color: Colors.black,
+                                    ))))),
+                  )),
+              Expanded(
+                  flex: 4,
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: GestureDetector(
+                            onTap: () {
+                              Game.getInstance().rotateCurrentShape();
+                            },
+                            child: Container(
+                                height: 70,
+                                width: 70,
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.yellow),
+                                child: Icon(Icons.rotate_left_sharp)))),
+                  )),
+            ],
+          )),
+        )
       ],
     );
   }
