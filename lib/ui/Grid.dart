@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:tetris_game/logic/Game.dart';
+import 'package:tetris_game/logic/Shape.dart';
 
 class Grid extends StatefulWidget {
   final Color backgroundColor;

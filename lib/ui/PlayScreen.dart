@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:tetris_game/logic/Game.dart';
@@ -14,6 +15,8 @@ class PlayScreen extends StatefulWidget {
 
 class _PlayScreenState extends State<PlayScreen> with WidgetsBindingObserver {
   Timer timer;
+  Audio _music = Audio("assets/sound/music.mp3");
+  AssetsAudioPlayer player = AssetsAudioPlayer.newPlayer();
   @override
   void initState() {
     super.initState();
@@ -24,6 +27,8 @@ class _PlayScreenState extends State<PlayScreen> with WidgetsBindingObserver {
         Game.getInstance().update();
       });
     });
+    player.open(_music, loopMode: LoopMode.single);
+    player.play();
   }
 
   @override
@@ -54,17 +59,18 @@ class _PlayScreenState extends State<PlayScreen> with WidgetsBindingObserver {
   void dispose() {
     super.dispose();
     timer.cancel();
+    player?.dispose();
     WidgetsBinding.instance.removeObserver(this);
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.paused && Game.getInstance().isGameRunning())
+    if (state == AppLifecycleState.paused && Game.getInstance().isGameRunning()){
       Game.getInstance().pauseGame();
+      player?.pause() ;}
   }
 
-  
   Widget _constructPlayPanel() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -75,7 +81,11 @@ class _PlayScreenState extends State<PlayScreen> with WidgetsBindingObserver {
             child: Row(
               mainAxisSize: MainAxisSize.max,
               children: [
-                Expanded(flex: 8,child:Grid(wallColor: Colors.white,)),
+                Expanded(
+                    flex: 8,
+                    child: Grid(
+                      wallColor: Colors.white,
+                    )),
                 Expanded(
                     flex: 3,
                     child: Container(
@@ -157,9 +167,15 @@ class _PlayScreenState extends State<PlayScreen> with WidgetsBindingObserver {
                                                   flex: 1,
                                                   child: FittedBox(
                                                       child: GestureDetector(
-                                                          onTap: () {
+                                                          onTapDown: (_) {
                                                             Game.getInstance()
-                                                                .moveLeft();
+                                                                .keyPressed(
+                                                                    KEY.LEFT);
+                                                          },
+                                                          onTapUp: (_) {
+                                                            Game.getInstance()
+                                                                .keyReleased(
+                                                                    KEY.LEFT);
                                                           },
                                                           child: Container(
                                                               decoration: BoxDecoration(
@@ -179,9 +195,15 @@ class _PlayScreenState extends State<PlayScreen> with WidgetsBindingObserver {
                                                   flex: 1,
                                                   child: FittedBox(
                                                       child: GestureDetector(
-                                                          onTap: () {
+                                                          onTapDown: (_) {
                                                             Game.getInstance()
-                                                                .moveRight();
+                                                                .keyPressed(
+                                                                    KEY.RIGHT);
+                                                          },
+                                                          onTapUp: (_) {
+                                                            Game.getInstance()
+                                                                .keyReleased(
+                                                                    KEY.RIGHT);
                                                           },
                                                           child: Container(
                                                               decoration: BoxDecoration(
@@ -209,9 +231,15 @@ class _PlayScreenState extends State<PlayScreen> with WidgetsBindingObserver {
                                                   flex: 1,
                                                   child: FittedBox(
                                                       child: GestureDetector(
-                                                          onTap: () {
+                                                          onTapDown: (_) {
                                                             Game.getInstance()
-                                                                .moveDown();
+                                                                .keyPressed(
+                                                                    KEY.DOWN);
+                                                          },
+                                                          onTapUp: (_) {
+                                                            Game.getInstance()
+                                                                .keyReleased(
+                                                                    KEY.DOWN);
                                                           },
                                                           child: Container(
                                                               decoration: BoxDecoration(
@@ -245,6 +273,7 @@ class _PlayScreenState extends State<PlayScreen> with WidgetsBindingObserver {
                                 child: InkWell(
                                     onTap: () {
                                       Game.getInstance().pauseGame();
+                                      player.pause();
                                     },
                                     child: Icon(
                                       Icons.pause,
@@ -258,8 +287,11 @@ class _PlayScreenState extends State<PlayScreen> with WidgetsBindingObserver {
                     child: Padding(
                         padding: EdgeInsets.all(20),
                         child: GestureDetector(
-                            onTap: () {
-                              Game.getInstance().rotateCurrentShape();
+                            onTapDown: (_) {
+                              Game.getInstance().keyPressed(KEY.ROTATE);
+                            },
+                            onTapUp: (_) {
+                              Game.getInstance().keyReleased(KEY.ROTATE);
                             },
                             child: Container(
                                 height: 70,
@@ -332,6 +364,7 @@ class _PlayScreenState extends State<PlayScreen> with WidgetsBindingObserver {
       return GestureDetector(
           onTap: () {
             Game.getInstance().startGame();
+            player.play();
           },
           child: Container(
             height: constraints.maxHeight,
